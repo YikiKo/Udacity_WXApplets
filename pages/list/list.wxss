@@ -1,0 +1,30 @@
+/* pages/list/list.wxss */
+.date-list{
+  display:flex;
+  height:150rpx;
+  margin:0rpx 40rpx;
+  align-items: center;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.day{
+  opacity: 0.5;
+  font-size:40rpx;
+  line-height: 56rpx;
+}
+.date{
+  opacity:0.5;
+  font-size:30rpx;
+  line-height:42rpx;
+}
+.temp{
+  flex-grow:1;
+  text-align: center;
+  font-size:40rpx;
+  line-height:56rpx;
+  opacity:0.5;
+  padding-right:60rpx;
+}
+.weather-icon{
+  width:90rpx;
+  height:90rpx;
+}

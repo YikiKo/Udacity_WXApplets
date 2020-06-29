@@ -49,21 +49,24 @@ Page({
       nowTemp:"12",
       nowWeather:"晴天",
       nowWeatherBackground:'/images/sunny-bg.png',
-      forecast:[1,2,3,4,5,6]
+      forecast:[1,2,3,4,5,6],
+      todayDate:2019,
+      todayTemp:16
   },
   getNow(callBack){
     wx.request({
-      url: 'https://test-miniprogram.com/api/weather/now', //仅为示例，并非真实的接口地址
+      url: 'https://test-miniprogram.com/api/weather/now', 
       data: {
         city:"广州市"
       },
       header: {
-        'content-type': 'application/json' // 默认值
+        'content-type': 'application/json' 
       },
       success:res => {
         let result = res.data.result
         this.setNow(result)
         this.setHourlyWeather(result)
+        this.setToday(result)
       },
       complete(){
         callBack&&callBack()
@@ -98,6 +101,19 @@ Page({
     forecast[0].time="现在"
     this.setData({
       forecast:forecast
+    })
+  },
+  setToday(result){
+    let date = new Date()
+    this.setData({
+      todayTemp:`${result.today.minTemp}°-${result.today.maxTemp}°`,
+      todayDate:`${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()} 今天`
+    })
+  },
+  onTapDayWeather(){
+    wx.showToast()
+    wx.navigateTo({
+      url: '/pages/list/list',
     })
   }
 })
