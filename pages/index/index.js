@@ -41,19 +41,24 @@ const weatherColorMap = {
  const UNAUTHORIZED = 1
  const AUTHORIZED = 2
 
- const UNPROMPTED_TIPS = "点击获取当前位置"
- const UNAUTHORIZED_TIPS = "点击开启位置权限"
- const AUTHORIZED_TIPS = ""
 Page({
   onLoad(){
-    console.log("onLoad")
-    this.getNow();
     this.qqmapsdk = new QQMapWX({
       key: 'FWYBZ-JA73P-LQODX-LJAQI-FMEFH-QPBB3'
   });
-  },
-  onReady(){
-    console.log("onReady")
+    wx.getSetting({
+      success:res=>{
+        let auth = res.authSetting["scope.userLocation"]
+        this.setData({
+          locationAuthType:auth?AUTHORIZED:(auth===false)?UNAUTHORIZED:UNPROMPTED
+        })
+        if(auth)
+          this.getCityAndWeather()
+        else
+          this.getNow()
+      }
+    })
+
   },
   onPullDownRefresh(){
     this.getNow(()=>{
@@ -61,16 +66,14 @@ Page({
     });
   },
   data:{
-    city:"广州市",
-    locationTipsText:"点击获取当前位置",
-      nowTemp:"12",
-      nowWeather:"晴天",
+    city:"北京市",
+      nowTemp:"99",
+      nowWeather:"究极龙卷风暴菊花台",
       nowWeatherBackground:'/images/sunny-bg.png',
       forecast:[1,2,3,4,5,6],
       todayDate:2019,
       todayTemp:16,
-      locationAuthType:UNPROMPTED,
-      locationTipsText:UNPROMPTED_TIPS
+      locationAuthType:UNPROMPTED
       
   },
   getNow(callBack){
@@ -142,22 +145,21 @@ Page({
         success:res=>{
           let auth = res.authSetting['scope.userLocation']
           if (auth){
-            this.getLocation()
+            this.getCityAndWeather()
           }
         }
       })
     }
     else
-      this.getLocation()
+      this.getCityAndWeather()
   },
-  getLocation(){
+  getCityAndWeather(){
     wx.getLocation({
       success:res=>{
         const latitude = res.latitude
         const longitude = res.longitude
         this.setData({
-          locationAuthType:AUTHORIZED,
-          locationTipsText:AUTHORIZED_TIPS
+          locationAuthType:AUTHORIZED
         })
         this.qqmapsdk.reverseGeocoder({
             location: {
@@ -167,18 +169,15 @@ Page({
             success:res=>{
               let city = res.result.address_component.city
               this.setData({
-                city,
-                locationTipsText:""
+                city
               })
               this.getNow()
             }
           })
      },
      fail:()=>{
-       console.log('fail')
        this.setData({
-         locationAuthType:UNAUTHORIZED,
-         locationTipsText:UNAUTHORIZED_TIPS
+         locationAuthType:UNAUTHORIZED
        })
      }
     })

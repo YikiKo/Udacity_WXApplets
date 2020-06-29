@@ -22,14 +22,10 @@ Page({
     city:"广州市"
   },
   onLoad(options){
-    console.log("onLoad")
     this.setData({
       city:options.city
     })
     this.getWeekWeather()
-  },
-  onReady(){
-    console.log("onReady")
   },
   onPullDownRefresh(){
     this.getWeekWeather(()=>{
@@ -68,7 +64,6 @@ Page({
         iconPath:`/images/${weatherIconMap[result[i].weather]}`
       })
     }
-    console.log(weekWeather)
     this.setData({
       weekWeather
     })
