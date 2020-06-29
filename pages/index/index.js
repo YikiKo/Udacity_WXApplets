@@ -35,10 +35,38 @@ const weatherColorMap = {
   'heavyrain': '#c5ccd0',
   'snow': '#aae1fc'
  }
+ var QQMapWX = require('../../libs/qqmap-wx-jssdk.js');
+ var qqmapsdk;
+ const UNPROMPTED = 0
+ const UNAUTHORIZED = 1
+ const AUTHORIZED = 2
 
+ const UNPROMPTED_TIPS = "点击获取当前位置"
+ const UNAUTHORIZED_TIPS = "点击开启位置权限"
+ const AUTHORIZED_TIPS = ""
 Page({
   onLoad(){
+    console.log("onLoad")
     this.getNow();
+    this.qqmapsdk = new QQMapWX({
+      key: 'FWYBZ-JA73P-LQODX-LJAQI-FMEFH-QPBB3'
+  });
+  },
+  onReady(){
+    console.log("onReady")
+  },
+  onShow(){
+    wx.getSetting({
+      success:res=>{
+        let auth = res.authSetting['scope.userLocation']
+        if (auth&&this.data.locationAuthType!==AUTHORIZED){
+          this.setData({
+            locationAuthType:AUTHORIZED,
+            locationTipsText:AUTHORIZED_TIPS
+          })
+        }
+      }
+    })
   },
   onPullDownRefresh(){
     this.getNow(()=>{
@@ -46,18 +74,23 @@ Page({
     });
   },
   data:{
+    city:"广州市",
+    locationTipsText:"点击获取当前位置",
       nowTemp:"12",
       nowWeather:"晴天",
       nowWeatherBackground:'/images/sunny-bg.png',
       forecast:[1,2,3,4,5,6],
       todayDate:2019,
-      todayTemp:16
+      todayTemp:16,
+      locationAuthType:UNPROMPTED,
+      locationTipsText:UNPROMPTED_TIPS
+      
   },
   getNow(callBack){
     wx.request({
       url: 'https://test-miniprogram.com/api/weather/now', 
       data: {
-        city:"广州市"
+        city:this.data.city
       },
       header: {
         'content-type': 'application/json' 
@@ -113,7 +146,47 @@ Page({
   onTapDayWeather(){
     wx.showToast()
     wx.navigateTo({
-      url: '/pages/list/list',
+      url: '/pages/list/list?city='+this.data.city,
+    })
+  },
+  onTapLocation(){
+    if(this.data.locationAuthType === UNAUTHORIZED){
+      wx.openSetting()
+    }
+    else
+      this.getLocation()
+  },
+  getLocation(){
+    wx.getLocation({
+      success:res=>{
+        const latitude = res.latitude
+        const longitude = res.longitude
+        this.setData({
+          locationAuthType:AUTHORIZED,
+          locationTipsText:AUTHORIZED_TIPS
+        })
+        this.qqmapsdk.reverseGeocoder({
+            location: {
+              latitude: latitude,
+              longitude: longitude
+            },
+            success:res=>{
+              let city = res.result.address_component.city
+              this.setData({
+                city,
+                locationTipsText:""
+              })
+              this.getNow()
+            }
+          })
+     },
+     fail:()=>{
+       console.log('fail')
+       this.setData({
+         locationAuthType:UNAUTHORIZED,
+         locationTipsText:UNAUTHORIZED_TIPS
+       })
+     }
     })
   }
 })

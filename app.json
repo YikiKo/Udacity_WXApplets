@@ -10,6 +10,11 @@
     "navigationBarTextStyle": "black",
     "enablePullDownRefresh": true
   },
+  "permission":{
+    "scope.userLocation":{
+      "desc":"你爹的小程序将获取你的定位"
+    }
+  },
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }

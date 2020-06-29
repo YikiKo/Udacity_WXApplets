@@ -18,10 +18,18 @@ const weekText=[
 ]
 Page({
   data: {
-    weekWeather:[1,2,3,4,5,6,7]
+    weekWeather:[1,2,3,4,5,6,7],
+    city:"广州市"
   },
-  onLoad(){
+  onLoad(options){
+    console.log("onLoad")
+    this.setData({
+      city:options.city
+    })
     this.getWeekWeather()
+  },
+  onReady(){
+    console.log("onReady")
   },
   onPullDownRefresh(){
     this.getWeekWeather(()=>{
@@ -33,7 +41,7 @@ Page({
       url: 'https://test-miniprogram.com/api/weather/future', 
       data: {
         time:new Date().getTime(),
-        city:"广州市"
+        city:this.data.city
       },
       header: {
         'content-type': 'application/json' 
